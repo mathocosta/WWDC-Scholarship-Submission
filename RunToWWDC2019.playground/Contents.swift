@@ -7,20 +7,39 @@ class GameScene: SKScene {
     var stateMachine: GKStateMachine!
     var runner: RunnerNode!
 
+    let longPressGesture = UILongPressGestureRecognizer()
+
     override func didMove(to view: SKView) {
         self.runner = RunnerNode()
+        self.runner.setScale(8.0)
         self.runner.position = CGPoint(x: view.frame.size.width / 2,
                                       y: view.frame.size.height / 2.0)
-        self.runner.setScale(8.0)
-
         self.addChild(self.runner)
 
         self.stateMachine = GKStateMachine(states: [
             IdleState(runner: runner),
             RunningState(runner: runner)
         ])
-
         self.stateMachine.enter(IdleState.self)
+
+        self.longPressGesture.addTarget(self, action: #selector(GameScene.longPress))
+        self.view?.addGestureRecognizer(self.longPressGesture)
+    }
+
+    @objc func longPress(_ sender: UILongPressGestureRecognizer) {
+        let longPressLocation = convertPoint(fromView: sender.location(in: self.view))
+
+        if sender.state == .began {
+            for child in self.children {
+                if let shapeNode = child as? RunnerNode {
+                    if shapeNode.contains(longPressLocation) {
+                        print("Found!")
+                    }
+                }
+            }
+        } else if sender.state == .ended {
+            print("ended")
+        }
     }
 
     @objc static override var supportsSecureCoding: Bool {
@@ -58,7 +77,6 @@ class GameScene: SKScene {
     }
 
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
     }
 }
 

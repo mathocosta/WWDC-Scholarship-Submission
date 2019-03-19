@@ -15,12 +15,20 @@ public class RunnerNode: SKSpriteNode {
 
     let longPressGesture = UILongPressGestureRecognizer()
 
+    var stateMachine: GKStateMachine!
+
     // MARK: - Life cycle
 
     public init() {
         let texture = SKTexture(imageNamed: "adventurer-idle-1")
         super.init(texture: texture, color: .clear, size: texture.size())
         self.isUserInteractionEnabled = true
+
+        self.stateMachine = GKStateMachine(states: [
+            IdleState(runner: self),
+            RunningState(runner: self)
+        ])
+        self.stateMachine.enter(IdleState.self)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -39,8 +47,7 @@ public class RunnerNode: SKSpriteNode {
     // MARK: - Touch Actions
 
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("tocuher")
-        self.lastAbsoluteTime = CFAbsoluteTimeGetCurrent()
+        self.stateMachine.enter(RunningState.self)
     }
 
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

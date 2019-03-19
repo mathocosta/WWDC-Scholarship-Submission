@@ -4,8 +4,8 @@ import SpriteKit
 
 class GameScene: SKScene {
 
-    var stateMachine: GKStateMachine!
     var runner: RunnerNode!
+    var label: SKLabelNode!
 
     let longPressGesture = UILongPressGestureRecognizer()
 
@@ -13,17 +13,26 @@ class GameScene: SKScene {
         self.runner = RunnerNode()
         self.runner.setScale(8.0)
         self.runner.position = CGPoint(x: view.frame.size.width / 2,
-                                      y: view.frame.size.height / 2.0)
+                                      y: view.frame.size.height / 2)
         self.addChild(self.runner)
-
-        self.stateMachine = GKStateMachine(states: [
-            IdleState(runner: runner),
-            RunningState(runner: runner)
-        ])
-        self.stateMachine.enter(IdleState.self)
 
         self.longPressGesture.addTarget(self, action: #selector(GameScene.longPress))
         self.view?.addGestureRecognizer(self.longPressGesture)
+
+        putMessage()
+    }
+
+    func putMessage() {
+        self.label = SKLabelNode(fontNamed: "SF Regular")
+        label.text = "Bom dia a todos"
+        label.horizontalAlignmentMode = .left
+        label.position = CGPoint(x: 0, y: 100)
+        self.addChild(label)
+    }
+
+    func changeMessage(to text: String) {
+        let singleLineMessage = SKLabelNode(text: text)
+        self.label = singleLineMessage.multilined()
     }
 
     @objc func longPress(_ sender: UILongPressGestureRecognizer) {
@@ -50,14 +59,14 @@ class GameScene: SKScene {
         }
     }
 
-    func touchDown(atPoint pos : CGPoint) {
-        self.stateMachine.enter(RunningState.self)
+    func touchDown(atPoint pos: CGPoint) {
+        self.changeMessage(to: "Agora corre negão, tu precisa chegar \n logo lá, eu quero que quebre o texto \n e eu possa ver como fica isso aaaa")
     }
 
-    func touchMoved(toPoint pos : CGPoint) {
+    func touchMoved(toPoint pos: CGPoint) {
     }
 
-    func touchUp(atPoint pos : CGPoint) {
+    func touchUp(atPoint pos: CGPoint) {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -80,14 +89,9 @@ class GameScene: SKScene {
     }
 }
 
-// Load the SKScene from 'GameScene.sks'
-let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
-if let scene = GameScene(fileNamed: "GameScene") {
-    // Set the scale mode to scale to fit the window
-    scene.scaleMode = .aspectFill
-
-    // Present the scene
-    sceneView.presentScene(scene)
-}
+let sceneView = SKView(frame: CGRect(x: 0 , y: 0, width: 800, height: 600))
+let scene = GameScene(size: sceneView.frame.size)
+scene.scaleMode = .aspectFill
+sceneView.presentScene(scene)
 
 PlaygroundSupport.PlaygroundPage.current.liveView = sceneView

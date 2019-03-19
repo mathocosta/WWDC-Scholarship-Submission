@@ -5,9 +5,17 @@ import SpriteKit
 class GameScene: SKScene {
 
     var runner: RunnerNode!
-    var label: SKLabelNode!
+    var messageLabel: MessageLabel!
 
     let longPressGesture = UILongPressGestureRecognizer()
+
+    var messageIndex = 0
+    let messages = [
+        "In a basic way, running is a method of locomotion that allows humans to move quickly on foot.",
+        "It's a type of walking characterized by the fact that there's the moment where all the feet are above the ground.",
+        "Running is part of human nature, we did it to survive and today we continue doing it, but with other goals as a health exercise or as a challenge itself.",
+        "It's simple you have to repeat the same thing you do to walk, only in a faster way."
+    ]
 
     override func didMove(to view: SKView) {
         self.runner = RunnerNode()
@@ -19,20 +27,15 @@ class GameScene: SKScene {
         self.longPressGesture.addTarget(self, action: #selector(GameScene.longPress))
         self.view?.addGestureRecognizer(self.longPressGesture)
 
-        putMessage()
-    }
-
-    func putMessage() {
-        self.label = SKLabelNode(fontNamed: "SF Regular")
-        label.text = "Bom dia a todos"
-        label.horizontalAlignmentMode = .left
-        label.position = CGPoint(x: 0, y: 100)
-        self.addChild(label)
+        self.messageLabel = MessageLabel()
+        self.messageLabel.position = CGPoint(x: 10, y: self.frame.height - 200)
+        self.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.8
+        self.messageLabel.text = self.messages[0]
+        self.addChild(self.messageLabel)
     }
 
     func changeMessage(to text: String) {
-        let singleLineMessage = SKLabelNode(text: text)
-        self.label = singleLineMessage.multilined()
+        self.messageLabel.text = text
     }
 
     @objc func longPress(_ sender: UILongPressGestureRecognizer) {
@@ -51,38 +54,13 @@ class GameScene: SKScene {
         }
     }
 
-    @objc static override var supportsSecureCoding: Bool {
-        // SKNode conforms to NSSecureCoding, so any subclass going
-        // through the decoding process must support secure coding
-        get {
-            return true
-        }
-    }
-
     func touchDown(atPoint pos: CGPoint) {
-        self.changeMessage(to: "Agora corre negão, tu precisa chegar \n logo lá, eu quero que quebre o texto \n e eu possa ver como fica isso aaaa")
-    }
-
-    func touchMoved(toPoint pos: CGPoint) {
-    }
-
-    func touchUp(atPoint pos: CGPoint) {
+        self.messageIndex += 1
+        self.changeMessage(to: self.messages[messageIndex])
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches { touchDown(atPoint: t.location(in: self)) }
-    }
-
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { touchMoved(toPoint: t.location(in: self)) }
-    }
-
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { touchUp(atPoint: t.location(in: self)) }
-    }
-
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { touchUp(atPoint: t.location(in: self)) }
     }
 
     override func update(_ currentTime: TimeInterval) {

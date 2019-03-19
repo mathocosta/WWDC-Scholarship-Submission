@@ -1,16 +1,26 @@
 import PlaygroundSupport
+import GameplayKit
 import SpriteKit
 
 class GameScene: SKScene {
 
-    override func didMove(to view: SKView) {
-        let adventurer = RunnerNode()
-        adventurer.position = CGPoint(x: view.frame.size.width / 2,
-                                      y: view.frame.size.height / 2.0)
-        adventurer.setScale(8.0)
+    var stateMachine: GKStateMachine!
+    var runner: RunnerNode!
 
-        self.addChild(adventurer)
-        adventurer.runAnimation()
+    override func didMove(to view: SKView) {
+        self.runner = RunnerNode()
+        self.runner.position = CGPoint(x: view.frame.size.width / 2,
+                                      y: view.frame.size.height / 2.0)
+        self.runner.setScale(8.0)
+
+        self.addChild(self.runner)
+
+        self.stateMachine = GKStateMachine(states: [
+            IdleState(runner: runner),
+            RunningState(runner: runner)
+        ])
+
+        self.stateMachine.enter(IdleState.self)
     }
 
     @objc static override var supportsSecureCoding: Bool {
@@ -22,6 +32,7 @@ class GameScene: SKScene {
     }
 
     func touchDown(atPoint pos : CGPoint) {
+        self.stateMachine.enter(RunningState.self)
     }
 
     func touchMoved(toPoint pos : CGPoint) {

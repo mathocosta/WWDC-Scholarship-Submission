@@ -1,11 +1,15 @@
 
 import UIKit
 import SpriteKit
+import GameplayKit
 
 public class RunnerNode: SKSpriteNode {
 
+    public var sprites: [SKTexture] = []
+    public var actionKey = "RunnerCurrentAction"
+
     public init() {
-        let texture = SKTexture(imageNamed: "adventurer-run-1")
+        let texture = SKTexture(imageNamed: "adventurer-idle-1")
         super.init(texture: texture, color: .clear, size: texture.size())
     }
 
@@ -14,17 +18,12 @@ public class RunnerNode: SKSpriteNode {
     }
 
     public func runAnimation() {
-        let sprites = [
-            SKTexture(imageNamed: "adventurer-run-1"),
-            SKTexture(imageNamed: "adventurer-run-2"),
-            SKTexture(imageNamed: "adventurer-run-3"),
-            SKTexture(imageNamed: "adventurer-run-4"),
-            SKTexture(imageNamed: "adventurer-run-5"),
-            SKTexture(imageNamed: "adventurer-run-6")
-        ]
+        let action = SKAction.repeatForever(SKAction.animate(with: self.sprites, timePerFrame: 0.2))
+        self.run(action, withKey: actionKey)
+    }
 
-        let action = SKAction.repeatForever(SKAction.animate(with: sprites, timePerFrame: 0.1))
-        self.run(action)
+    public func stopAnimation() {
+        self.removeAction(forKey: actionKey)
     }
 
 }

@@ -21,6 +21,9 @@ let allTexts = [
 public class GameScene: SKScene {
 
     var runner: RunnerNode!
+
+    var buttonNext: ButtonNode!
+
     var textsController: TextsController!
 
     let longPressGesture = UILongPressGestureRecognizer()
@@ -39,6 +42,15 @@ public class GameScene: SKScene {
         self.textsController.delegate = self
         self.textsController.start(with: allTexts[0]!)
         self.addChild(self.textsController.messageLabel)
+
+        let defaultButtonSize = CGSize(width: 200, height: 70)
+        self.buttonNext = ButtonNode(text: "Next", size: defaultButtonSize)
+        self.buttonNext.position = CGPoint(x: (frame.width - defaultButtonSize.width / 2) - 50,
+                                           y: (defaultButtonSize.height / 2) + 20)
+        self.buttonNext.wasClicked = { [weak self] in
+            self?.textsController.textShouldChangeToNext()
+        }
+        self.addChild(self.buttonNext)
     }
 
     @objc func longPress(_ sender: UILongPressGestureRecognizer) {
@@ -55,14 +67,6 @@ public class GameScene: SKScene {
         } else if sender.state == .ended {
             print("ended")
         }
-    }
-
-    func touchDown(atPoint pos: CGPoint) {
-        self.textsController.textShouldChangeToNext()
-    }
-
-    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { touchDown(atPoint: t.location(in: self)) }
     }
 
     public override func update(_ currentTime: TimeInterval) {

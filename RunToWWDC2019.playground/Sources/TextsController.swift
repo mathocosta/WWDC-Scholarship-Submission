@@ -6,8 +6,10 @@ public class MessageLabel: SKLabelNode {
         super.init()
 
         self.fontName = "SF Regular"
+        self.fontSize = 20
         self.horizontalAlignmentMode = .left
         self.lineBreakMode = .byWordWrapping
+        self.verticalAlignmentMode = .top
         self.numberOfLines = 0
     }
 
@@ -23,6 +25,8 @@ protocol TextsControllerDelegate: class {
 
 public class TextsController {
 
+    // MARK: - Properties
+
     public var scene: GameScene
     public var messageLabel: MessageLabel
 
@@ -31,24 +35,26 @@ public class TextsController {
 
     weak var delegate: TextsControllerDelegate?
 
+    // MARK: - Life cycle
+
     public init(scene: GameScene) {
         self.scene = scene
         self.currentTextsIndex = 0
 
         self.messageLabel = MessageLabel()
-        self.messageLabel.position = CGPoint(x: 10, y: scene.frame.height - 200)
+        self.messageLabel.position = CGPoint(x: 20, y: scene.frame.height - 20)
         self.messageLabel.preferredMaxLayoutWidth = scene.frame.width * 0.8
     }
 
-    func start(with texts: [String]) {
-        self.currentTexts = texts
+    func start(with part: TextPart) {
+        self.currentTexts = part.texts
         self.currentTextsIndex = 0
         self.messageLabel.text = self.currentTexts[self.currentTextsIndex]
     }
 
     public func textShouldChangeToNext() {
         self.currentTextsIndex += 1
-        print("index: \(self.currentTextsIndex)")
+
         if self.currentTextsIndex < self.currentTexts.count {
             self.messageLabel.text = self.currentTexts[self.currentTextsIndex]
         } else {

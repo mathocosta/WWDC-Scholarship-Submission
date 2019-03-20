@@ -2,21 +2,29 @@ import PlaygroundSupport
 import GameplayKit
 import SpriteKit
 
-public class GameScene: SKScene {
-
-    var runner: RunnerNode!
-    var messageLabel: MessageLabel!
-
-    let longPressGesture = UILongPressGestureRecognizer()
-
-    var messageIndex = 0
-    let messages = [
+let allTexts = [
+    0: [
         "In a basic way, running is a method of locomotion that allows humans to move quickly on foot.",
         "It's a type of walking characterized by the fact that there's the moment where all the feet are above the ground.",
         "Running is part of human nature, we did it to survive and today we continue doing it, but with other goals as a health exercise or as a challenge itself.",
         "It's simple you have to repeat the same thing you do to walk, only in a faster way."
+    ],
+    1: [
+        "But how does something so simple, that people already learn when children can be so important and interesting to think about?",
+        "There are factors that I think are the most common things most people know about, which are health-related.",
+        "Did you know that run is a great way to help improve cardiovascular health?",
+        "It is also proven that runners tend to sleep better, show signs of better psychological functioning and more focus during the day.",
+        "Other studies indicate that exercise can help people cope with stress."
     ]
+]
 
+public class GameScene: SKScene {
+
+    var runner: RunnerNode!
+    var textsController: TextsController!
+
+    let longPressGesture = UILongPressGestureRecognizer()
+    
     public override func didMove(to view: SKView) {
         self.runner = RunnerNode()
         self.runner.setScale(8.0)
@@ -27,15 +35,10 @@ public class GameScene: SKScene {
         self.longPressGesture.addTarget(self, action: #selector(GameScene.longPress))
         self.view?.addGestureRecognizer(self.longPressGesture)
 
-        self.messageLabel = MessageLabel()
-        self.messageLabel.position = CGPoint(x: 10, y: self.frame.height - 200)
-        self.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.8
-        self.messageLabel.text = self.messages[0]
-        self.addChild(self.messageLabel)
-    }
-
-    func changeMessage(to text: String) {
-        self.messageLabel.text = text
+        self.textsController = TextsController(scene: self)
+        self.textsController.delegate = self
+        self.textsController.start(with: allTexts[0]!)
+        self.addChild(self.textsController.messageLabel)
     }
 
     @objc func longPress(_ sender: UILongPressGestureRecognizer) {
@@ -55,8 +58,7 @@ public class GameScene: SKScene {
     }
 
     func touchDown(atPoint pos: CGPoint) {
-        self.messageIndex += 1
-        self.changeMessage(to: self.messages[messageIndex])
+        self.textsController.textShouldChangeToNext()
     }
 
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -65,4 +67,14 @@ public class GameScene: SKScene {
 
     public override func update(_ currentTime: TimeInterval) {
     }
+
+}
+
+// MARK: - TextsControllerDelegate
+extension GameScene: TextsControllerDelegate {
+
+    func textPartEnded() {
+        self.textsController.start(with: allTexts[1]!)
+    }
+
 }

@@ -3,6 +3,7 @@ import Foundation
 public struct TextPart: Decodable {
     var title: String
     var texts: [String]
+    var hasInteraction: Bool
 }
 
 public class TextsParser {

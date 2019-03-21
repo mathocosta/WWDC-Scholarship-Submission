@@ -16,7 +16,15 @@ public class GameScene: SKScene {
 
     lazy var longPressGesture: UILongPressGestureRecognizer = {
         let recognizer = UILongPressGestureRecognizer()
-        recognizer.addTarget(self, action: #selector(GameScene.longPress))
+        recognizer.addTarget(self, action: #selector(GameScene.onLongPress(_:)))
+        recognizer.isEnabled = false
+
+        return recognizer
+    }()
+
+    lazy var swipeGesture: UISwipeGestureRecognizer = {
+        let recognizer = UISwipeGestureRecognizer()
+        recognizer.addTarget(self, action: #selector(GameScene.onSwipe(_:)))
         recognizer.isEnabled = false
 
         return recognizer
@@ -32,12 +40,14 @@ public class GameScene: SKScene {
         self.addChild(self.runner)
         
         view.addGestureRecognizer(self.longPressGesture)
+        view.addGestureRecognizer(self.swipeGesture)
 
         self.allTexts = TextsParser.processFile()
 
         self.textsController = TextsController(scene: self)
         self.textsController.delegate = self
         self.textsController.start(with: self.allTexts[0])
+        self.addChild(self.textsController.titleLabel)
         self.addChild(self.textsController.messageLabel)
 
         let defaultButtonSize = CGSize(width: 200, height: 70)
@@ -53,9 +63,9 @@ public class GameScene: SKScene {
     public override func update(_ currentTime: TimeInterval) {
     }
 
-    // MARK: - Touch Actions
+    // MARK: - Gestures
 
-    @objc func longPress(_ sender: UILongPressGestureRecognizer) {
+    @objc func onLongPress(_ sender: UILongPressGestureRecognizer) {
         let longPressLocation = convertPoint(fromView: sender.location(in: self.view))
 
         if sender.state == .began {
@@ -71,6 +81,24 @@ public class GameScene: SKScene {
         }
     }
 
+    @objc func onSwipe(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        if gestureRecognizer.state == .ended {
+            if gestureRecognizer.direction == .up {
+                print("Gesto para cima")
+            } else if gestureRecognizer.direction == .right {
+                print("Gesto para direita")
+            } else if gestureRecognizer.direction == .left {
+                print("Gesto para esquerda")
+            }
+        }
+    }
+
+    private func changeSwipeDirection(to newDirection: UISwipeGestureRecognizer.Direction) {
+        self.swipeGesture.isEnabled = false
+        self.swipeGesture.direction = newDirection
+        self.swipeGesture.isEnabled = true
+    }
+
 }
 
 // MARK: - TextsControllerDelegate
@@ -82,6 +110,35 @@ extension GameScene: TextsControllerDelegate {
             self.textsController.start(with: allTexts[self.allTextsIndex])
         }
 
+    }
+
+    func activateInteractionFor(_ partTitle: String) {
+        switch partTitle {
+        case "Life as a running":
+            // Taps
+            self.runner.isUserInteractionEnabled = true
+            print("Life is a running")
+        case "Obstacles":
+            // Gesto para cima
+            self.runner.isUserInteractionEnabled = false
+            self.changeSwipeDirection(to: .up)
+            print("obstacles")
+        case "Hills":
+            // Gesto para direita, ou diagonal direita de baixo pra cima
+            self.changeSwipeDirection(to: .right)
+            print("hills")
+        case "Pace":
+            // Gesto para a esquerda
+            self.changeSwipeDirection(to: .left)
+            print("pace")
+        case "Goals":
+            // Long press
+            self.swipeGesture.isEnabled = false
+            self.longPressGesture.isEnabled = true
+            print("goals")
+        default:
+            print("Nada")
+        }
     }
 
 }

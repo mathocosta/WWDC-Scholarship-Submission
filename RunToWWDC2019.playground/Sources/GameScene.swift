@@ -9,6 +9,7 @@ public class GameScene: SKScene {
     var runner: RunnerNode!
 
     var buttonNext: ButtonNode!
+    var interactionTimer: Timer!
 
     var allTextsIndex = 0
     var allTexts: [TextPart]!
@@ -37,10 +38,12 @@ public class GameScene: SKScene {
         self.runner.setScale(8.0)
         self.runner.position = CGPoint(x: view.frame.size.width / 2,
                                        y: view.frame.size.height / 2)
+        self.runner.whenTapped = { [weak self] in
+            self?.interactionWasPerformed()
+        }
         self.addChild(self.runner)
-        
-        view.addGestureRecognizer(self.longPressGesture)
-        view.addGestureRecognizer(self.swipeGesture)
+
+        self.configureControls()
 
         self.allTexts = TextsParser.processFile()
 
@@ -74,39 +77,12 @@ public class GameScene: SKScene {
         self.textsController.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.4
     }
 
-    // MARK: - Gestures (iOS Controls)
-
-    @objc func onLongPress(_ sender: UILongPressGestureRecognizer) {
-        let longPressLocation = convertPoint(fromView: sender.location(in: self.view))
-
-        if sender.state == .began {
-            for child in self.children {
-                if let shapeNode = child as? RunnerNode {
-                    if shapeNode.contains(longPressLocation) {
-                        self.textsController.textShouldChangeToNext()
-                    }
-                }
-            }
-        } else if sender.state == .ended {
-            self.buttonNext.isUserInteractionEnabled = true
-        }
-    }
-
-    @objc func onSwipe(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        if gestureRecognizer.state == .ended {
-            if gestureRecognizer.direction == .up ||
-                gestureRecognizer.direction == .right ||
-                gestureRecognizer.direction == .left {
-                self.textsController.textShouldChangeToNext()
-                self.buttonNext.isUserInteractionEnabled = true
-            }
-        }
-    }
-
-    private func changeSwipeDirection(to newDirection: UISwipeGestureRecognizer.Direction) {
-        self.swipeGesture.isEnabled = false
-        self.swipeGesture.direction = newDirection
-        self.swipeGesture.isEnabled = true
+    // Configure controls based on OS
+    private func configureControls() {
+        guard let view = self.view else { return }
+        
+        view.addGestureRecognizer(self.longPressGesture)
+        view.addGestureRecognizer(self.swipeGesture)
     }
 
 }
@@ -122,37 +98,85 @@ extension GameScene: TextsControllerDelegate {
 
     }
 
+    // Activates the interaction that part
     func activateInteractionFor(_ partTitle: String) {
         self.buttonNext.isUserInteractionEnabled = false
+        self.buttonNext.isHidden = true
+        self.interactionTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
+            self.interactionWasPerformed(false)
+        }
 
         switch partTitle {
         case "Life as a running":
             // Taps
             self.runner.isUserInteractionEnabled = true
-            print("Life is a running")
         case "Obstacles":
             // Swipe up
-            self.runner.isUserInteractionEnabled = false
             self.changeSwipeDirection(to: .up)
-            print("obstacles")
         case "Hills":
             // Swipe rigth
             self.changeSwipeDirection(to: .right)
-            print("hills")
         case "Pace":
             // Swipe left
             self.changeSwipeDirection(to: .left)
-            print("pace")
         case "Goals":
             // Long press
             self.swipeGesture.isEnabled = false
             self.longPressGesture.isEnabled = true
-            print("goals")
         case "Conclusion":
             self.prepareForConclusion()
         default:
-            print("Nada")
+            print("None")
         }
+    }
+
+    // Called when the interaction ends
+    // It changes the screen text at the end according to the paramenter
+    func interactionWasPerformed(_ changeText: Bool = true) {
+        self.buttonNext.isUserInteractionEnabled = true
+        self.buttonNext.isHidden = false
+        self.interactionTimer.invalidate()
+
+        if changeText {
+            self.textsController.textShouldChangeToNext()
+        }
+    }
+
+}
+
+// MARK: - Gestures (iOS Controls)
+extension GameScene {
+
+    @objc func onLongPress(_ sender: UILongPressGestureRecognizer) {
+        let longPressLocation = convertPoint(fromView: sender.location(in: self.view))
+
+        if sender.state == .began {
+            for child in self.children {
+                if let shapeNode = child as? RunnerNode {
+                    if shapeNode.contains(longPressLocation) {
+                        self.interactionWasPerformed()
+                    }
+                }
+            }
+        } else if sender.state == .ended {
+            self.buttonNext.isUserInteractionEnabled = true
+        }
+    }
+
+    @objc func onSwipe(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        if gestureRecognizer.state == .ended {
+            if gestureRecognizer.direction == .up ||
+                gestureRecognizer.direction == .right ||
+                gestureRecognizer.direction == .left {
+                self.interactionWasPerformed()
+            }
+        }
+    }
+
+    private func changeSwipeDirection(to newDirection: UISwipeGestureRecognizer.Direction) {
+        self.swipeGesture.isEnabled = false
+        self.swipeGesture.direction = newDirection
+        self.swipeGesture.isEnabled = true
     }
 
 }

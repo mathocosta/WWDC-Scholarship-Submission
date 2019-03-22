@@ -13,6 +13,8 @@ public class RunnerNode: SKSpriteNode {
 
     var stateMachine: GKStateMachine!
 
+    var whenTapped: (() -> Void)?
+
     // MARK: - Life cycle
 
     public init() {
@@ -47,6 +49,9 @@ public class RunnerNode: SKSpriteNode {
 
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.stateMachine.enter(RunningState.self)
+        self.isUserInteractionEnabled = false
+        guard let whenTapped = self.whenTapped else { return }
+        whenTapped()
     }
     
 }

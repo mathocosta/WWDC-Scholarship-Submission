@@ -51,6 +51,7 @@ public class TextsController {
         self.titleLabel.preferredMaxLayoutWidth = scene.frame.width * 0.8
 
         self.messageLabel = MessageLabel()
+        self.messageLabel.fontSize = 30
         self.messageLabel.position = CGPoint(x: 20, y: scene.frame.height - 40)
         self.messageLabel.preferredMaxLayoutWidth = scene.frame.width * 0.8
     }

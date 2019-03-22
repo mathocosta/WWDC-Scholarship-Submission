@@ -63,7 +63,18 @@ public class GameScene: SKScene {
     public override func update(_ currentTime: TimeInterval) {
     }
 
-    // MARK: - Gestures
+    private func prepareForConclusion() {
+        // Character must move to right side of screen
+        let runnerPosition = CGPoint(x: (self.frame.size.width - self.runner.size.width / 2) - 20,
+                                     y: frame.size.height / 2)
+        let actionForRunner = SKAction.move(to: runnerPosition, duration: 0.5)
+        self.runner.run(actionForRunner)
+
+        // Text must appear on the right side and must have a maximum of 50% of the screen width
+        self.textsController.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.4
+    }
+
+    // MARK: - Gestures (iOS Controls)
 
     @objc func onLongPress(_ sender: UILongPressGestureRecognizer) {
         let longPressLocation = convertPoint(fromView: sender.location(in: self.view))
@@ -72,23 +83,22 @@ public class GameScene: SKScene {
             for child in self.children {
                 if let shapeNode = child as? RunnerNode {
                     if shapeNode.contains(longPressLocation) {
-                        print("Found!")
+                        self.textsController.textShouldChangeToNext()
                     }
                 }
             }
         } else if sender.state == .ended {
-            print("ended")
+            self.buttonNext.isUserInteractionEnabled = true
         }
     }
 
     @objc func onSwipe(_ gestureRecognizer: UISwipeGestureRecognizer) {
         if gestureRecognizer.state == .ended {
-            if gestureRecognizer.direction == .up {
-                print("Gesto para cima")
-            } else if gestureRecognizer.direction == .right {
-                print("Gesto para direita")
-            } else if gestureRecognizer.direction == .left {
-                print("Gesto para esquerda")
+            if gestureRecognizer.direction == .up ||
+                gestureRecognizer.direction == .right ||
+                gestureRecognizer.direction == .left {
+                self.textsController.textShouldChangeToNext()
+                self.buttonNext.isUserInteractionEnabled = true
             }
         }
     }
@@ -113,22 +123,24 @@ extension GameScene: TextsControllerDelegate {
     }
 
     func activateInteractionFor(_ partTitle: String) {
+        self.buttonNext.isUserInteractionEnabled = false
+
         switch partTitle {
         case "Life as a running":
             // Taps
             self.runner.isUserInteractionEnabled = true
             print("Life is a running")
         case "Obstacles":
-            // Gesto para cima
+            // Swipe up
             self.runner.isUserInteractionEnabled = false
             self.changeSwipeDirection(to: .up)
             print("obstacles")
         case "Hills":
-            // Gesto para direita, ou diagonal direita de baixo pra cima
+            // Swipe rigth
             self.changeSwipeDirection(to: .right)
             print("hills")
         case "Pace":
-            // Gesto para a esquerda
+            // Swipe left
             self.changeSwipeDirection(to: .left)
             print("pace")
         case "Goals":
@@ -136,6 +148,8 @@ extension GameScene: TextsControllerDelegate {
             self.swipeGesture.isEnabled = false
             self.longPressGesture.isEnabled = true
             print("goals")
+        case "Conclusion":
+            self.prepareForConclusion()
         default:
             print("Nada")
         }

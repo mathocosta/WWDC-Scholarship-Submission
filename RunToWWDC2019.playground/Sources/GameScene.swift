@@ -6,6 +6,8 @@ public class GameScene: SKScene {
 
     // MARK: - Properties
 
+    var isScenarioMoving = false
+
     var runner: RunnerNode!
 
     var buttonNext: ButtonNode!
@@ -38,12 +40,15 @@ public class GameScene: SKScene {
     // MARK: - Life cycle
 
     public override func didMove(to view: SKView) {
+        self.createScenario()
+
         self.runner = RunnerNode()
         self.runner.setScale(8.0)
         self.runner.position = CGPoint(x: view.frame.size.width / 2,
                                        y: view.frame.size.height / 2)
         self.runner.whenTapped = { [weak self] in
             self?.interactionWasPerformed()
+            self?.isScenarioMoving = true
         }
         self.addChild(self.runner)
 
@@ -62,7 +67,7 @@ public class GameScene: SKScene {
         self.addChild(self.textsController.messageLabel)
 
         let defaultButtonSize = CGSize(width: 200, height: 70)
-        self.buttonNext = ButtonNode(text: "Next", size: defaultButtonSize)
+        self.buttonNext = ButtonNode(size: defaultButtonSize, textureName: "next-button")
         self.buttonNext.position = CGPoint(x: (frame.width - defaultButtonSize.width / 2) - 50,
                                            y: (defaultButtonSize.height / 2) + 20)
         self.buttonNext.wasClicked = { [weak self] in
@@ -72,9 +77,14 @@ public class GameScene: SKScene {
     }
 
     public override func update(_ currentTime: TimeInterval) {
+        if self.isScenarioMoving {
+            self.moveScenario()
+        }
     }
 
     private func prepareForConclusion() {
+        self.interactionTimer.invalidate()
+
         // Character must move to right side of screen
         let runnerPosition = CGPoint(x: self.runner.size.width / 2,
                                      y: frame.size.height / 2)
@@ -82,9 +92,52 @@ public class GameScene: SKScene {
         self.runner.run(actionForRunner)
 
         // Text must appear on the right side and must have a maximum of 50% of the screen width
-        self.textsController.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.4
+        self.textsController.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.5
         self.textsController.titleLabel.position = CGPoint(x: self.frame.width / 2 - 20, y: self.frame.height - 20)
         self.textsController.messageLabel.position = CGPoint(x: self.frame.width / 2 - 20, y: self.frame.height - 40)
+
+        // Adds end button
+        self.buttonNext.isHidden = false
+        self.buttonNext.isUserInteractionEnabled = true
+        let endTexture = SKTexture(imageNamed: "end-button")
+        self.buttonNext.texture = endTexture
+    }
+
+    // MARK: - Background and ground
+    func createScenario() {
+        for i in 0...3 {
+            let background = SKSpriteNode(imageNamed: "sky")
+            background.name = "Sky"
+            background.size = CGSize(width: self.size.width, height: self.size.height)
+            background.anchorPoint = self.anchorPoint
+            background.position = CGPoint(x: CGFloat(i) * background.size.width, y: 0)
+            self.addChild(background)
+
+            // TODO: Consertar a posição Y
+            let ground = SKSpriteNode(imageNamed: "ground")
+            ground.name = "Ground"
+            ground.size = CGSize(width: self.size.width, height: self.size.height)
+            ground.anchorPoint = self.anchorPoint
+            ground.position = CGPoint(x: CGFloat(i) * ground.size.width,
+                                      y: -(self.size.height / 2))
+            self.addChild(ground)
+        }
+    }
+
+    func moveScenario() {
+        self.enumerateChildNodes(withName: "Sky") { (node, error) in
+            node.position.x -= 0.3
+            if node.position.x < -(self.size.width) {
+                node.position.x += self.size.width * 3
+            }
+        }
+
+        self.enumerateChildNodes(withName: "Ground") { (node, error) in
+            node.position.x -= 3
+            if node.position.x < -(self.size.width) {
+                node.position.x += self.size.width * 3
+            }
+        }
     }
 
 }
@@ -200,10 +253,11 @@ extension GameScene {
 
     @objc func onSwipe(_ gestureRecognizer: UISwipeGestureRecognizer) {
         if gestureRecognizer.state == .ended {
-            if gestureRecognizer.direction == .up ||
-                gestureRecognizer.direction == .right ||
-                gestureRecognizer.direction == .left {
+            if gestureRecognizer.direction == .right || gestureRecognizer.direction == .left {
                 self.interactionWasPerformed()
+            } else if gestureRecognizer.direction == .up {
+                self.interactionWasPerformed()
+                self.runner.jump()
             }
         }
     }
@@ -226,7 +280,11 @@ extension GameScene {
         let key = event.keyCode
 
         if key == self.keyToCheck {
-            self.interactionWasPerformed()
+            if key == 0x7E {
+                self.runner.jump()
+            } else {
+                self.interactionWasPerformed()
+            }
         }
     }
 

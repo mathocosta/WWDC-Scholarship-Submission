@@ -4,21 +4,15 @@ public class ButtonNode: SKSpriteNode {
 
     // MARK: - Properties
 
-    public var label = SKLabelNode(fontNamed: "SFRegular")
     public var wasClicked: (() -> Void)?
 
     // MARK: - Life cycle
 
-    public init(text: String, size: CGSize) {
-        let texture = SKTexture(imageNamed: "")
-        super.init(texture: texture, color: .clear, size: size)
+    public init(size: CGSize, textureName: String) {
+        let texture = SKTexture(imageNamed: textureName)
+        super.init(texture: texture, color: .clear, size: texture.size())
 
         self.isUserInteractionEnabled = true
-
-        self.label.text = text
-        self.label.verticalAlignmentMode = .center
-        self.label.horizontalAlignmentMode = .center
-        self.addChild(self.label)
     }
 
     public required init?(coder aDecoder: NSCoder) {

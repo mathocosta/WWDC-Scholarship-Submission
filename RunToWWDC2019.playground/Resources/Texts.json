@@ -70,7 +70,7 @@
     },
     {
         "title": "Conclusion",
-        "hasInteraction": false,
+        "hasInteraction": true,
         "texts": [
             "Although simple, starting to run is difficult and requires perseverance. Just like life.",
             "There will be days of rain, that you can slip and get wet, but also sunny days and that everything will work out."
@@ -80,7 +80,8 @@
         "title": "My name is Matheus Oliveira Costa",
         "hasInteraction": false,
         "texts": [
-            "I am a graduate student at the Federal University of Ceará in Brazil. I like software development and how it can help people's lives these days. I am a research fellow at the IFCE / Apple Developer Academy, where I put it into practice by creating apps that fit the reality of the community. I started running a while ago and soon after realized how much it helped me both physically and mentally, so the motivation to play the playground. Nowadays, I do not stop running, much because life does not stop either."
+            "I am a graduate student at the Federal University of Ceará in Brazil. I like software development and how it can help people's lives these days. I am a research fellow at the IFCE / Apple Developer Academy, where I put it into practice by creating apps that fit the reality of the community.",
+            "I started running a while ago and soon after realized how much it helped me both physically and mentally, so the motivation to play the playground. Nowadays, I do not stop running, much because life does not stop either."
         ]
     }
 ]

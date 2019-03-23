@@ -43,6 +43,16 @@ public class RunnerNode: SKSpriteNode {
         self.removeAction(forKey: actionKey)
     }
 
+    public func jump() {
+        self.runAnimation()
+
+        let jumpUpAction = SKAction.moveBy(x: 0, y: 40, duration: 0.2)
+        let jumpDownAction = SKAction.moveBy(x: 0, y: -40, duration: 0.2)
+        let jumpSequence = SKAction.sequence([jumpUpAction, jumpDownAction])
+
+        self.run(jumpSequence)
+    }
+
     // MARK: - Actions
     #if os(iOS)
     

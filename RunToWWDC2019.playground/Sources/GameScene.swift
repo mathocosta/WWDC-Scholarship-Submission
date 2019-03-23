@@ -11,10 +11,13 @@ public class GameScene: SKScene {
     var buttonNext: ButtonNode!
     var interactionTimer: Timer!
 
+    var keyToCheck: UInt16!
+
     var allTextsIndex = 0
     var allTexts: [TextPart]!
     var textsController: TextsController!
 
+    #if os(iOS)
     lazy var longPressGesture: UILongPressGestureRecognizer = {
         let recognizer = UILongPressGestureRecognizer()
         recognizer.addTarget(self, action: #selector(GameScene.onLongPress(_:)))
@@ -30,6 +33,7 @@ public class GameScene: SKScene {
 
         return recognizer
     }()
+    #endif
 
     // MARK: - Life cycle
 
@@ -43,7 +47,11 @@ public class GameScene: SKScene {
         }
         self.addChild(self.runner)
 
-        self.configureControls()
+        // Add the gestures if is iOS
+        #if os(iOS)
+        view.addGestureRecognizer(self.longPressGesture)
+        view.addGestureRecognizer(self.swipeGesture)
+        #endif
 
         self.allTexts = TextsParser.processFile()
 
@@ -68,21 +76,15 @@ public class GameScene: SKScene {
 
     private func prepareForConclusion() {
         // Character must move to right side of screen
-        let runnerPosition = CGPoint(x: (self.frame.size.width - self.runner.size.width / 2) - 20,
+        let runnerPosition = CGPoint(x: self.runner.size.width / 2,
                                      y: frame.size.height / 2)
         let actionForRunner = SKAction.move(to: runnerPosition, duration: 0.5)
         self.runner.run(actionForRunner)
 
         // Text must appear on the right side and must have a maximum of 50% of the screen width
         self.textsController.messageLabel.preferredMaxLayoutWidth = self.frame.width * 0.4
-    }
-
-    // Configure controls based on OS
-    private func configureControls() {
-        guard let view = self.view else { return }
-        
-        view.addGestureRecognizer(self.longPressGesture)
-        view.addGestureRecognizer(self.swipeGesture)
+        self.textsController.titleLabel.position = CGPoint(x: self.frame.width / 2 - 20, y: self.frame.height - 20)
+        self.textsController.messageLabel.position = CGPoint(x: self.frame.width / 2 - 20, y: self.frame.height - 40)
     }
 
 }
@@ -106,6 +108,7 @@ extension GameScene: TextsControllerDelegate {
             self.interactionWasPerformed(false)
         }
 
+        #if os(iOS)
         switch partTitle {
         case "Life as a running":
             // Taps
@@ -128,6 +131,37 @@ extension GameScene: TextsControllerDelegate {
         default:
             print("None")
         }
+
+        #elseif os(OSX)
+
+        let leftKey: UInt16  = 0x7B
+        let rightKey: UInt16 = 0x7C
+        let upKey: UInt16    = 0x7E
+        let downKey: UInt16  = 0x7D
+
+        switch partTitle {
+        case "Life as a running":
+            // Mouse down
+            self.runner.isUserInteractionEnabled = true
+        case "Obstacles":
+            // Press up arrow
+            self.keyToCheck = upKey
+        case "Hills":
+            // Press right arrow
+            self.keyToCheck = rightKey
+        case "Pace":
+            // Press left arrow
+            self.keyToCheck = leftKey
+        case "Goals":
+            // Press down key
+            self.keyToCheck = downKey
+        case "Conclusion":
+            self.prepareForConclusion()
+        default:
+            print("None")
+        }
+
+        #endif
     }
 
     // Called when the interaction ends
@@ -144,6 +178,7 @@ extension GameScene: TextsControllerDelegate {
 
 }
 
+#if os(iOS)
 // MARK: - Gestures (iOS Controls)
 extension GameScene {
 
@@ -180,3 +215,20 @@ extension GameScene {
     }
 
 }
+#endif
+
+#if os(OSX)
+// MARK: - Keyboard (OSX Controls)
+extension GameScene {
+
+    public override func keyDown(with event: NSEvent) {
+
+        let key = event.keyCode
+
+        if key == self.keyToCheck {
+            self.interactionWasPerformed()
+        }
+    }
+
+}
+#endif

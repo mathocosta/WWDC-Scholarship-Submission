@@ -20,7 +20,8 @@ public class RunnerNode: SKSpriteNode {
     public init() {
         let texture = SKTexture(imageNamed: "adventurer-idle-1")
         super.init(texture: texture, color: .clear, size: texture.size())
-        self.isUserInteractionEnabled = true
+        self.isUserInteractionEnabled = false
+        self.name = "RunnerNode"
 
         self.stateMachine = GKStateMachine(states: [
             IdleState(runner: self),
@@ -42,8 +43,9 @@ public class RunnerNode: SKSpriteNode {
         self.removeAction(forKey: actionKey)
     }
 
-    // MARK: - Touch Actions
-
+    // MARK: - Actions
+    #if os(iOS)
+    
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     }
 
@@ -53,5 +55,15 @@ public class RunnerNode: SKSpriteNode {
         guard let whenTapped = self.whenTapped else { return }
         whenTapped()
     }
-    
+
+    #elseif os(OSX)
+
+    public override func mouseDown(with event: NSEvent) {
+        self.stateMachine.enter(RunningState.self)
+        self.isUserInteractionEnabled = false
+        guard let whenTapped = self.whenTapped else { return }
+        whenTapped()
+    }
+
+    #endif
 }

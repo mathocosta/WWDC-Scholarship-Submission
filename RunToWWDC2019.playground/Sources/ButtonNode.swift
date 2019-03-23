@@ -25,11 +25,18 @@ public class ButtonNode: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Touch Actions
 
+    // MARK: - Actions
+    #if os(iOS)
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let wasClicked = self.wasClicked else { return }
         wasClicked()
     }
+    #elseif os(OSX)
+    public override func mouseDown(with event: NSEvent) {
+        guard let wasClicked = self.wasClicked else { return }
+        wasClicked()
+    }
+    #endif
 
 }

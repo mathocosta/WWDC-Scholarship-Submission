@@ -25,8 +25,25 @@ public class IdleState: RunnerState {
         super.init(runner: runner)
 
         self.sprites = [
-            SKTexture(imageNamed: "adventurer-idle-1"),
-            SKTexture(imageNamed: "adventurer-idle-2")
+            SKTexture(imageNamed: "idle-1"),
+            SKTexture(imageNamed: "idle-2"),
+            SKTexture(imageNamed: "idle-3"),
+            SKTexture(imageNamed: "idle-4"),
+            SKTexture(imageNamed: "idle-5")
+        ]
+    }
+}
+
+public class JumpingState: RunnerState {
+    public override init(runner: RunnerNode) {
+        super.init(runner: runner)
+
+        self.sprites = [
+            SKTexture(imageNamed: "jump-1"),
+            SKTexture(imageNamed: "jump-1"),
+            SKTexture(imageNamed: "jump-1"),
+            SKTexture(imageNamed: "jump-2"),
+            SKTexture(imageNamed: "jump-3")
         ]
     }
 }
@@ -36,13 +53,23 @@ public class RunningState: RunnerState {
         super.init(runner: runner)
 
         self.sprites = [
-            SKTexture(imageNamed: "adventurer-run-1"),
-            SKTexture(imageNamed: "adventurer-run-2"),
-            SKTexture(imageNamed: "adventurer-run-3"),
-            SKTexture(imageNamed: "adventurer-run-4"),
-            SKTexture(imageNamed: "adventurer-run-5"),
-            SKTexture(imageNamed: "adventurer-run-6")
+            SKTexture(imageNamed: "running-1"),
+            SKTexture(imageNamed: "running-2"),
+            SKTexture(imageNamed: "running-3"),
+            SKTexture(imageNamed: "running-4"),
+            SKTexture(imageNamed: "running-5"),
+            SKTexture(imageNamed: "running-6")
         ]
+    }
+
+    public override func didEnter(from previousState: GKState?) {
+        super.didEnter(from: previousState)
+        SKTAudio.sharedInstance().playBackgroundMusic("running.wav")
+    }
+
+    public override func willExit(to nextState: GKState) {
+        super.willExit(to: nextState)
+        SKTAudio.sharedInstance().pauseBackgroundMusic()
     }
 }
 

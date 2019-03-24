@@ -35,6 +35,14 @@ public class GameScene: SKScene {
 
         return recognizer
     }()
+
+    #elseif os(OSX)
+
+    let leftKey: UInt16  = 0x7B
+    let rightKey: UInt16 = 0x7C
+    let upKey: UInt16    = 0x7E
+    let downKey: UInt16  = 0x7D
+
     #endif
 
     // MARK: - Life cycle
@@ -43,7 +51,7 @@ public class GameScene: SKScene {
         self.createScenario()
 
         self.runner = RunnerNode()
-        self.runner.setScale(8.0)
+        self.runner.setScale(3.0)
         self.runner.position = CGPoint(x: view.frame.size.width / 2,
                                        y: view.frame.size.height / 2)
         self.runner.whenTapped = { [weak self] in
@@ -187,11 +195,6 @@ extension GameScene: TextsControllerDelegate {
 
         #elseif os(OSX)
 
-        let leftKey: UInt16  = 0x7B
-        let rightKey: UInt16 = 0x7C
-        let upKey: UInt16    = 0x7E
-        let downKey: UInt16  = 0x7D
-
         switch partTitle {
         case "Life as a running":
             // Mouse down
@@ -256,7 +259,6 @@ extension GameScene {
             if gestureRecognizer.direction == .right || gestureRecognizer.direction == .left {
                 self.interactionWasPerformed()
             } else if gestureRecognizer.direction == .up {
-                self.interactionWasPerformed()
                 self.runner.jump()
             }
         }
@@ -280,9 +282,13 @@ extension GameScene {
         let key = event.keyCode
 
         if key == self.keyToCheck {
-            if key == 0x7E {
+            if key == self.upKey {
                 self.runner.jump()
             } else {
+                if key == self.downKey {
+                    self.runner.stateMachine.enter(IdleState.self)
+                    self.isScenarioMoving = false
+                }
                 self.interactionWasPerformed()
             }
         }

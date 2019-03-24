@@ -25,6 +25,7 @@ public class RunnerNode: SKSpriteNode {
 
         self.stateMachine = GKStateMachine(states: [
             IdleState(runner: self),
+            JumpingState(runner: self),
             RunningState(runner: self)
         ])
         self.stateMachine.enter(IdleState.self)
@@ -35,7 +36,7 @@ public class RunnerNode: SKSpriteNode {
     }
 
     public func runAnimation() {
-        let action = SKAction.repeatForever(SKAction.animate(with: self.sprites, timePerFrame: 0.2))
+        let action = SKAction.repeatForever(SKAction.animate(with: self.sprites, timePerFrame: 0.1))
         self.run(action, withKey: actionKey)
     }
 
@@ -44,6 +45,7 @@ public class RunnerNode: SKSpriteNode {
     }
 
     public func jump() {
+        self.stateMachine.enter(JumpingState.self)
         self.runAnimation()
 
         let jumpUpAction = SKAction.moveBy(x: 0, y: 40, duration: 0.2)
@@ -54,6 +56,7 @@ public class RunnerNode: SKSpriteNode {
     }
 
     // MARK: - Actions
+    
     #if os(iOS)
     
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

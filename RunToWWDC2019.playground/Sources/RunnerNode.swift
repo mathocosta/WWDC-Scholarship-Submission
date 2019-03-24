@@ -6,6 +6,7 @@ public class RunnerNode: SKSpriteNode {
     // MARK: - Properties
 
     public var sprites: [SKTexture] = []
+    public var timePerFrame: TimeInterval = 0.1
     public var actionKey = "RunnerCurrentAction"
 
     var lastAbsoluteTime: CFAbsoluteTime!
@@ -26,7 +27,8 @@ public class RunnerNode: SKSpriteNode {
         self.stateMachine = GKStateMachine(states: [
             IdleState(runner: self),
             JumpingState(runner: self),
-            RunningState(runner: self)
+            RunningState(runner: self),
+            RunningAndBreathing(runner: self)
         ])
         self.stateMachine.enter(IdleState.self)
     }
@@ -36,7 +38,8 @@ public class RunnerNode: SKSpriteNode {
     }
 
     public func runAnimation() {
-        let action = SKAction.repeatForever(SKAction.animate(with: self.sprites, timePerFrame: 0.1))
+        let action = SKAction.repeatForever(
+            SKAction.animate(with: self.sprites, timePerFrame: self.timePerFrame))
         self.run(action, withKey: actionKey)
     }
 
@@ -53,6 +56,9 @@ public class RunnerNode: SKSpriteNode {
         let jumpSequence = SKAction.sequence([jumpUpAction, jumpDownAction])
 
         self.run(jumpSequence)
+        self.run(jumpSequence) {
+            self.stateMachine.enter(RunningState.self)
+        }
     }
 
     // MARK: - Actions

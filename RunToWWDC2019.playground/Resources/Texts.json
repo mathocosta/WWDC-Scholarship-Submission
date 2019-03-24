@@ -35,7 +35,7 @@
         "texts": [
             "When you are running, many obstacles will appear, you will stumble sometimes, you may bump into some people, etc. Just like in life, sometimes things are not perfect.",
             "But you can get up and keep running, stand still thinking about it will not lead to anything.",
-            "Come on, swipe up for the character to jump the obstacles."
+            "Come on, swipe up or press up arrow for the character avoid the obstacles."
         ]
     },
     {
@@ -45,7 +45,7 @@
             "Another common moment in a race is when you find a hill, that to get past it, you will need a lot of effort and get bored.",
             "In the middle of the path, you can think of giving up and coming back. But at some point, it will pass and will return to normal.",
             "So we can not let ourselves be carried down the slopes of life and give up our dreams.",
-            "Our runner is almost stopping, swipe to the right to encourage him to run more."
+            "Our runner is almost stopping, swipe to the right or press right arrow to encourage him to run more."
         ]
     },
     {
@@ -55,7 +55,7 @@
             "We also have to think at our pace.",
             "When running you should find your pace, otherwise, you will get tired well before you can reach.",
             "We don't need to hurry to finish or get rid of something, some things need time to live and absorb in the right way.",
-            "Now he's very fast, swipe to the left so he slows down."
+            "Now he's very fast, swipe to the left or press left key so he slows down."
         ]
     },
     {
@@ -65,7 +65,7 @@
             "Lastly, you must have your goals, they should define your satisfaction and for your happiness.",
             "There will always be better runners than you, but that's their goal, you have yours.",
             "To reach them you must follow a sequence, one step at a time. And it may be that at some point you realize that you got where you wanted and you are happy, even if there are others.",
-            "Hold the character so he can stop whenever you want"
+            "Hold the character or press down key so he can stop whenever you want"
         ]
     },
     {
@@ -77,10 +77,10 @@
         ]
     },
     {
-        "title": "My name is Matheus Oliveira Costa",
+        "title": "About me",
         "hasInteraction": false,
         "texts": [
-            "I am a graduate student at the Federal University of Ceará in Brazil. I like software development and how it can help people's lives these days. I am a research fellow at the IFCE / Apple Developer Academy, where I put it into practice by creating apps that fit the reality of the community.",
+            "My name is Matheus Oliveira Costa. I am a graduate student at the Federal University of Ceará in Brazil. I like software development and how it can help people's lives these days. I am a research fellow at the IFCE / Apple Developer Academy, where I put it into practice by creating apps that fit the reality of the community.",
             "I started running a while ago and soon after realized how much it helped me both physically and mentally, so the motivation to play the playground. Nowadays, I do not stop running, much because life does not stop either."
         ]
     }

@@ -5,6 +5,7 @@ public class RunnerState: GKState {
     private var runner: RunnerNode
 
     public var sprites: [SKTexture]!
+    public var timePerFrame: TimeInterval!
 
     public init(runner: RunnerNode) {
         self.runner = runner
@@ -12,6 +13,7 @@ public class RunnerState: GKState {
 
     public override func didEnter(from previousState: GKState?) {
         self.runner.sprites = self.sprites
+        self.runner.timePerFrame = self.timePerFrame
         self.runner.runAnimation()
     }
 
@@ -31,6 +33,8 @@ public class IdleState: RunnerState {
             SKTexture(imageNamed: "idle-4"),
             SKTexture(imageNamed: "idle-5")
         ]
+
+        self.timePerFrame = 0.2
     }
 }
 
@@ -45,6 +49,8 @@ public class JumpingState: RunnerState {
             SKTexture(imageNamed: "jump-2"),
             SKTexture(imageNamed: "jump-3")
         ]
+
+        self.timePerFrame = 0.1
     }
 }
 
@@ -60,6 +66,8 @@ public class RunningState: RunnerState {
             SKTexture(imageNamed: "running-5"),
             SKTexture(imageNamed: "running-6")
         ]
+
+        self.timePerFrame = 0.1
     }
 
     public override func didEnter(from previousState: GKState?) {
@@ -68,6 +76,24 @@ public class RunningState: RunnerState {
     }
 
     public override func willExit(to nextState: GKState) {
+        super.willExit(to: nextState)
+        SKTAudio.sharedInstance().pauseBackgroundMusic()
+    }
+}
+
+class RunningAndBreathing: RunningState {
+    public override init(runner: RunnerNode) {
+        super.init(runner: runner)
+
+        self.timePerFrame = 0.08
+    }
+
+    override func didEnter(from previousState: GKState?) {
+        super.didEnter(from: previousState)
+        SKTAudio.sharedInstance().playBackgroundMusic("breathing.wav")
+    }
+
+    override func willExit(to nextState: GKState) {
         super.willExit(to: nextState)
         SKTAudio.sharedInstance().pauseBackgroundMusic()
     }

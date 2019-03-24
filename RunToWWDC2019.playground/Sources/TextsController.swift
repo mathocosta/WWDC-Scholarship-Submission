@@ -7,7 +7,7 @@ public class MessageLabel: SKLabelNode {
 
         self.fontName = "SF Regular"
         self.fontSize = 20
-        self.fontColor = NSColor.black
+        self.fontColor = .black
         self.horizontalAlignmentMode = .left
         self.lineBreakMode = .byWordWrapping
         self.verticalAlignmentMode = .top
